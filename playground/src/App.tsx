@@ -1,57 +1,76 @@
-import { PlayIcon } from 'lucide-react';
-import { useState } from 'react';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
+import { SandpackProvider } from '@codesandbox/sandpack-react';
+import { Console } from './components/console';
 import { Editor } from './components/editor';
 import { Header, HeaderPrefix, HeaderSuffix } from './components/header';
 import { Logo } from './components/logo';
 import { ModeToggle } from './components/mode-toggle';
-import { Button } from './components/ui/button';
-import { Kbd } from './components/ui/kbd';
+import { RunButton } from './components/run-button';
+import { useTheme } from './components/theme-provider';
 import { Separator } from './components/ui/separator';
 
 function App() {
-  const [code, setCode] = useState('');
+  const { theme } = useTheme();
 
   return (
-    <div className="flex flex-col w-full h-full min-w-sm">
-      <Header>
-        <HeaderPrefix>
-          <Logo />
-        </HeaderPrefix>
-        <HeaderSuffix>
-          <ModeToggle />
-          <Button variant="outline">
-            <PlayIcon className="size-4" />
-            Run
-            <Kbd>⌘ ⏎</Kbd>
-          </Button>
-        </HeaderSuffix>
-      </Header>
-      <Separator />
-      <main className="flex-1 w-full">
-        <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel defaultSize={20} minSize={20} collapsible>
-            <div className="flex bg-background h-full w-full p-6">
-              <span className="font-semibold">One</span>
-            </div>
-          </ResizablePanel>
-
-          <ResizableHandle />
-          <ResizablePanel defaultSize={80}>
-            <ResizablePanelGroup direction="vertical">
-              <ResizablePanel defaultSize={80} collapsible>
-                <Editor value={code} onChange={setCode} />
-              </ResizablePanel>
-              <ResizableHandle />
+    <div className=" w-full h-full min-w-sm">
+      <SandpackProvider
+        theme={theme === 'dark' ? 'dark' : 'light'}
+        template="vanilla-ts"
+        className="h-full!"
+        options={{
+          autorun: false,
+          autoReload: false,
+          logLevel: 0,
+        }}
+        customSetup={{
+          dependencies: {
+            'es-toolkit': '^1.30.1',
+          },
+        }}
+        files={{
+          '/index.ts': {
+            code: `import { sum } from "es-toolkit";
+            
+console.log(sum([1, 2, 3]));`,
+          },
+        }}
+      >
+        <div className="flex flex-col w-full h-full">
+          <Header>
+            <HeaderPrefix>
+              <Logo />
+            </HeaderPrefix>
+            <HeaderSuffix>
+              <ModeToggle />
+              <RunButton />
+            </HeaderSuffix>
+          </Header>
+          <Separator />
+          <main className="flex-1 w-full">
+            <ResizablePanelGroup direction="horizontal">
               <ResizablePanel defaultSize={20} minSize={20} collapsible>
-                <div className="flex bg-background h-full p-6 w-full">
-                  <span className="font-semibold">Three</span>
+                <div className="flex bg-background h-full w-full p-6">
+                  <span className="font-semibold">One</span>
                 </div>
               </ResizablePanel>
+
+              <ResizableHandle />
+              <ResizablePanel defaultSize={80}>
+                <ResizablePanelGroup direction="vertical">
+                  <ResizablePanel defaultSize={80}>
+                    <Editor />
+                  </ResizablePanel>
+                  <ResizableHandle />
+                  <ResizablePanel defaultSize={20} className="p-4">
+                    <Console />
+                  </ResizablePanel>
+                </ResizablePanelGroup>
+              </ResizablePanel>
             </ResizablePanelGroup>
-          </ResizablePanel>
-        </ResizablePanelGroup>
-      </main>
+          </main>
+        </div>
+      </SandpackProvider>
     </div>
   );
 }

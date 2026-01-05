@@ -235,5 +235,8 @@
       "unplugged": true
     }
   },
-  "react-native": "./dist/index.js"
+  "react-native": "./dist/index.js",
+  "resolutions": {
+    "@codemirror/state": "6.4.0"
+  }
 }

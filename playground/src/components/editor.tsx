@@ -1,35 +1,39 @@
 import type { editor } from 'monaco-editor';
-import { Editor as MonacoEditor } from '@monaco-editor/react';
+import { SandpackStack, useActiveCode, useSandpack } from '@codesandbox/sandpack-react';
+import { Editor as MonacoEditor, type OnMount } from '@monaco-editor/react';
 import { useTheme } from './theme-provider';
-
-interface EditorProps {
-  value: string;
-  onChange: (value: string) => void;
-}
 
 const editorOptions = {
   minimap: { enabled: false },
   padding: { top: 24, bottom: 24 },
-  lineNumbers: 'off',
   fontFamily: 'var(--font-mono)',
 } as editor.IStandaloneEditorConstructionOptions;
 
-export function Editor({ value, onChange }: EditorProps) {
+export function Editor() {
+  const { code, updateCode } = useActiveCode();
+  const { sandpack } = useSandpack();
   const { theme } = useTheme();
 
-  const handleChange = (value: string | undefined) => {
-    if (value === undefined) return;
-    onChange(value);
+  const handleEditorMount: OnMount = (editor, monaco) => {
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
+      sandpack.runSandpack();
+    });
   };
 
   return (
-    <MonacoEditor
-      className="z-999"
-      value={value}
-      onChange={handleChange}
-      language="typescript"
-      theme={theme === 'dark' ? 'vs-dark' : 'light'}
-      options={editorOptions}
-    />
+    <SandpackStack style={{ margin: 0, height: '100%' }}>
+      <MonacoEditor
+        key={sandpack.activeFile}
+        width="100%"
+        height="100%"
+        defaultValue={code}
+        value={code}
+        onChange={value => updateCode(value || '')}
+        onMount={handleEditorMount}
+        language="typescript"
+        theme={theme === 'dark' ? 'vs-dark' : 'light'}
+        options={editorOptions}
+      />
+    </SandpackStack>
   );
 }

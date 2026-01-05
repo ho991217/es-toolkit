@@ -1,5 +1,7 @@
 import { PlayIcon } from 'lucide-react';
+import { useState } from 'react';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
+import { Editor } from './components/editor';
 import { Header, HeaderPrefix, HeaderSuffix } from './components/header';
 import { Logo } from './components/logo';
 import { ModeToggle } from './components/mode-toggle';
@@ -8,8 +10,10 @@ import { Kbd } from './components/ui/kbd';
 import { Separator } from './components/ui/separator';
 
 function App() {
+  const [code, setCode] = useState('');
+
   return (
-    <div className="flex flex-col w-full h-full bg-foreground/5 min-w-sm">
+    <div className="flex flex-col w-full h-full min-w-sm">
       <Header>
         <HeaderPrefix>
           <Logo />
@@ -36,9 +40,7 @@ function App() {
           <ResizablePanel defaultSize={80}>
             <ResizablePanelGroup direction="vertical">
               <ResizablePanel defaultSize={80} collapsible>
-                <div className="flex bg-background h-full p-6 w-full">
-                  <span className="font-semibold">Two</span>
-                </div>
+                <Editor value={code} onChange={setCode} />
               </ResizablePanel>
               <ResizableHandle />
               <ResizablePanel defaultSize={20} minSize={20} collapsible>

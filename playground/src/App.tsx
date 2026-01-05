@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+import esToolkitBundle from 'virtual:es-toolkit-bundle';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { SandpackProvider } from '@codesandbox/sandpack-react';
 import { Console } from './components/console';
@@ -12,6 +14,29 @@ import { Separator } from './components/ui/separator';
 function App() {
   const { theme } = useTheme();
 
+  const files = useMemo(
+    () => ({
+      '/index.ts': {
+        code: `import { sum } from "es-toolkit";
+
+console.log(sum([1, 2, 3]));`,
+      },
+      '/node_modules/es-toolkit/package.json': {
+        hidden: true,
+        code: JSON.stringify({
+          name: 'es-toolkit',
+          main: './index.js',
+          types: './index.d.ts',
+        }),
+      },
+      '/node_modules/es-toolkit/index.js': {
+        hidden: true,
+        code: esToolkitBundle,
+      },
+    }),
+    []
+  );
+
   return (
     <div className=" w-full h-full min-w-sm">
       <SandpackProvider
@@ -23,18 +48,7 @@ function App() {
           autoReload: false,
           logLevel: 0,
         }}
-        customSetup={{
-          dependencies: {
-            'es-toolkit': '^1.30.1',
-          },
-        }}
-        files={{
-          '/index.ts': {
-            code: `import { sum } from "es-toolkit";
-            
-console.log(sum([1, 2, 3]));`,
-          },
-        }}
+        files={files}
       >
         <div className="flex flex-col w-full h-full">
           <Header>

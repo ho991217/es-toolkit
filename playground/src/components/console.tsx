@@ -18,10 +18,6 @@ function ConsoleLogs({ clientId }: { clientId: string }) {
         case 'status':
           setState(message.status);
           break;
-        case 'dependencies':
-          setState(`installing dependencies...: ${(message.data as any).name}`);
-          setIsLoading(true);
-          break;
         case 'done':
           setState('done');
           setIsLoading(false);

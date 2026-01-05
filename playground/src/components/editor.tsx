@@ -1,4 +1,5 @@
 import type { editor } from 'monaco-editor';
+import esToolkitTypes from 'virtual:es-toolkit-types';
 import { SandpackStack, useActiveCode, useSandpack } from '@codesandbox/sandpack-react';
 import { Editor as MonacoEditor, type OnMount } from '@monaco-editor/react';
 import { useTheme } from './theme-provider';
@@ -17,6 +18,19 @@ export function Editor() {
   const handleEditorMount: OnMount = (editor, monaco) => {
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
       sandpack.runSandpack();
+    });
+
+    monaco.languages.typescript.typescriptDefaults.addExtraLib(
+      `declare module 'es-toolkit' {\n${esToolkitTypes}\n}`,
+      'file:///node_modules/@types/es-toolkit/index.d.ts'
+    );
+
+    monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+      ...monaco.languages.typescript.typescriptDefaults.getCompilerOptions(),
+      moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+      allowSyntheticDefaultImports: true,
+      esModuleInterop: true,
+      target: monaco.languages.typescript.ScriptTarget.ES2020,
     });
   };
 
